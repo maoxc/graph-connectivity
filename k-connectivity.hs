@@ -1,4 +1,3 @@
--- By Kemény Tamás
 import Data.Map.Internal as Map
 import Data.List as List
 
