@@ -43,6 +43,12 @@ pop :: Queue -> (Int, Queue)
 pop (Queue inb [])   = pop $ Queue [] (reverse inb)
 pop (Queue inb outb) = (head outb, Queue inb (tail outb))
 
+-- Returns True if e is already an element of the input queue
+queued :: Int -> Queue -> Bool
+queued e (Queue inb out)
+    | elem e inb || elem e out = True
+    | otherwise = False
+
 -- Unweighted, simple, directed graph data structure
 data Graph = Graph {
   children :: Map Int [Int],
@@ -61,16 +67,7 @@ fromEdges edges = Graph children parents allEdges vertices
   (children,parents) = List.foldl (\(map1,map2) (u,v) -> (addNeighbour u v map1, addNeighbour v u map2)) (Map.empty,Map.empty) allEdges
   vertices = Map.keys children
 
--- Returns all combinations of input list of size 2
-pairs :: [Int] -> [(Int,Int)]
-pairs []     = []
-pairs (x:xs) = [(x,y)|y<-xs] ++ pairs xs
 
--- Returns True if e is already an element of the input queue
-queued :: Int -> Queue -> Bool
-queued e (Queue inb out)
-    | elem e inb || elem e out = True
-    | otherwise = False
 
 -- Computes the edge-connectivity of the input graph
 -- By Menger's theorem, the size of the minimum edge/vertex cut for s and t is equal to the maximum number of
@@ -154,3 +151,8 @@ residual (u,v) flow = 1 - (if member (u,v) flow then flow!(u,v) else 0)
 -- Computes the excess flow in vertex u
 excess :: Int -> Map Int [Int] -> Map (Int,Int) Int -> Int
 excess u children flow = sum [if elem u (children!v) then flow!(v,u) else 0|v<-Map.keys children] - sum [flow!(u,v)|v<-(children!u)]
+
+-- Returns all combinations of input list of size 2
+pairs :: [Int] -> [(Int,Int)]
+pairs []     = []
+pairs (x:xs) = [(x,y)|y<-xs] ++ pairs xs
