@@ -135,7 +135,6 @@ goldberg children parents flow heights q s t =
  where
  (u,poppedQueue) = pop q
  -- Flow may be pushed along outgoing edges or flow may be pushed back into incoming edges
- -- A bit is used to determine the direction of the edge {u,v} so we know what kind of push to perform along the edge
  pushableEdges = List.filter (\v -> (residual (u,v) flow > 0) && (heights!u > heights!v)) $ (children!u) ++ (if member u parents then (parents!u) else [])
 
 -- Add v to the neighbourhood of u in the adjacency map
