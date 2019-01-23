@@ -19,7 +19,7 @@ import           Data.Map.Internal as Map
 --  [(1,2),(3,4)]
 
 -- Usage:
---  Functions vconn or econn followed by an input graph.
+--  Functions vertexConnectivity or edgeConnectivity followed by input graph as a list of edges
 -- Note:
 --  The input graph should be specified as a list of edges
 --  The input graph is treated as undirected
@@ -96,7 +96,7 @@ vertexConnectivity inputEdges = minimum [initGoldberg (Graph newAdjMap newInvMap
 -- 1) A zero flow is constructed
 -- 2) Source vertex is assigned height n (where n is the number of vertices)
 -- 3) All out-edges from the source are saturated and their endpoints enqueued
--- The main part of the algorithm is then called
+-- The main loop of the algorithm is then called
 initGoldberg :: Graph -> Int -> Int -> Int
 initGoldberg graph s t = goldberg children parents flow heights initQueue s t
  where
@@ -109,7 +109,7 @@ initGoldberg graph s t = goldberg children parents flow heights initQueue s t
  initQueue = Queue [] $ List.filter (\u -> (excess u children flow) > 0) excludeST
 
 goldberg :: Map Int [Int] -> Map Int [Int] -> Map (Int,Int) Int -> Map Int Int -> Queue -> Int -> Int -> Int
--- Base case: The queue is empty, all internal vertices have excess = 0, flow conservation is satisfied
+-- Base case: The queue is empty, all internal vertices have zero excess, flow conservation is satisfied
 -- meaning the preflow is now a feasible flow. The target's inflow is returned
 goldberg children parents flow heights (Queue [] []) s t = excess t children flow
 goldberg children parents flow heights q s t =
@@ -134,7 +134,7 @@ goldberg children parents flow heights q s t =
  else goldberg children parents flow (Map.insert u (1+(heights!u)) heights) q s t
  where
  (u,poppedQueue) = pop q
- -- Flow may be pushed along outgoing edges or flow may be pushed back into incoming edges
+ -- Flow may be pushed along outgoing edges or pushed back into incoming edges
  pushableEdges = List.filter (\v -> (residual (u,v) flow > 0) && (heights!u > heights!v)) $ (children!u) ++ (if member u parents then (parents!u) else [])
 
 -- Add v to the neighbourhood of u in the adjacency map
